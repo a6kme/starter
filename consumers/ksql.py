@@ -6,20 +6,21 @@ import requests
 
 from config import KSQL_URL
 from consumers import topic_check
+from topics import TURNSTILE_SUMMARY_TABLE_NAME, TURNSTILE_TOPIC_NAME
 
 logger = logging.getLogger(__name__)
 
-KSQL_STATEMENT = """
+KSQL_STATEMENT = f"""
 CREATE TABLE turnstile (
     timestamp BIGINT,
     station_id INT,
     station_name VARCHAR,
     line INT
 ) WITH (
-    KAFKA_TOPIC='turnstile', VALUE_FORMAT='Avro', KEY='timestamp'
+    KAFKA_TOPIC='{TURNSTILE_TOPIC_NAME}', VALUE_FORMAT='Avro', KEY='timestamp'
 );
 
-CREATE TABLE turnstile_summary
+CREATE TABLE {TURNSTILE_SUMMARY_TABLE_NAME}
     AS 
         SELECT 
             station_id, count(*) as count 
@@ -30,7 +31,7 @@ CREATE TABLE turnstile_summary
 
 def execute_statement():
     """Executes the KSQL statement against the KSQL API"""
-    if topic_check.topic_exists("TURNSTILE_SUMMARY") is True:
+    if topic_check.topic_exists(TURNSTILE_SUMMARY_TABLE_NAME) is True:
         return
 
     logging.debug("executing ksql statement...")

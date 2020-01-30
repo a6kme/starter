@@ -4,6 +4,7 @@ from pathlib import Path
 
 from confluent_kafka import avro
 
+from topics import TURNSTILE_TOPIC_NAME
 from .producer import Producer
 from .turnstile_hardware import TurnstileHardware
 from config import NUM_PARTITIONS, NUM_REPLICAS
@@ -18,7 +19,7 @@ class Turnstile(Producer):
     def __init__(self, station):
         """Create the Turnstile"""
         super().__init__(
-            topic_name='turnstile',
+            topic_name=TURNSTILE_TOPIC_NAME,
             key_schema=Turnstile.key_schema,
             value_schema=Turnstile.value_schema,
             num_partitions=NUM_PARTITIONS,

@@ -7,15 +7,14 @@ import tornado.ioloop
 import tornado.template
 import tornado.web
 
+import topics
 
 # Import logging before models to ensure configuration is picked up
 logging.config.fileConfig(f"{Path(__file__).parents[0]}/logging.ini")
 
-
-from consumer import KafkaConsumer
-from models import Lines, Weather
-import topic_check
-
+from consumers import topic_check
+from consumers.consumer import KafkaConsumer
+from consumers.models import Lines, Weather
 
 logger = logging.getLogger(__name__)
 
@@ -41,12 +40,12 @@ class MainHandler(tornado.web.RequestHandler):
 
 def run_server():
     """Runs the Tornado Server and begins Kafka consumption"""
-    if topic_check.topic_exists("TURNSTILE_SUMMARY") is False:
+    if topic_check.topic_exists(topics.TURNSTILE_TOPIC_NAME) is False:
         logger.fatal(
             "Ensure that the KSQL Command has run successfully before running the web server!"
         )
         exit(1)
-    if topic_check.topic_exists("org.chicago.cta.stations.table.v1") is False:
+    if topic_check.topic_exists(topics.STATIONS_TOPIC_NAME) is False:
         logger.fatal(
             "Ensure that Faust Streaming is running successfully before running the web server!"
         )
@@ -63,23 +62,23 @@ def run_server():
     # Build kafka consumers
     consumers = [
         KafkaConsumer(
-            "org.chicago.cta.weather.v1",
+            topics.WEATHER_TOPIC_NAME,
             weather_model.process_message,
             offset_earliest=True,
         ),
         KafkaConsumer(
-            "org.chicago.cta.stations.table.v1",
+            f'{topics.TOPIC_PREFIX_FOR_STATIONS_CONNECTOR}stations',
             lines.process_message,
             offset_earliest=True,
             is_avro=False,
         ),
         KafkaConsumer(
-            "^org.chicago.cta.station.arrivals.",
+            topics.ARRIVALS_TOPIC_NAME,
             lines.process_message,
             offset_earliest=True,
         ),
         KafkaConsumer(
-            "TURNSTILE_SUMMARY",
+            topics.TURNSTILE_SUMMARY_TABLE_NAME,
             lines.process_message,
             offset_earliest=True,
             is_avro=False,

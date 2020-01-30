@@ -3,12 +3,13 @@ import datetime
 import json
 import logging
 import random
-from enum import IntEnum
 from pathlib import Path
 
 import requests
 
 from config import REST_PROXY_URL, NUM_PARTITIONS, NUM_REPLICAS
+from enums import weather_status
+from topics import WEATHER_TOPIC_NAME
 from .producer import Producer
 
 logger = logging.getLogger(__name__)
@@ -17,9 +18,7 @@ logger = logging.getLogger(__name__)
 class Weather(Producer):
     """Defines a simulated weather model"""
 
-    status = IntEnum(
-        "status", "sunny partly_cloudy cloudy windy precipitation", start=0
-    )
+    status = weather_status
 
     rest_proxy_url = REST_PROXY_URL
 
@@ -30,7 +29,7 @@ class Weather(Producer):
     summer_months = {6, 7, 8}  # set
 
     def __init__(self, month):
-        self.topic_name = 'weather'
+        self.topic_name = WEATHER_TOPIC_NAME
         self.status = Weather.status.sunny
         self.temp = 70.0
         if month in Weather.winter_months:

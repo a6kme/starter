@@ -3,7 +3,8 @@ import logging
 
 import faust
 
-from config import KAFKA_URL, STATIONS_TOPIC_PREFIX
+from config import KAFKA_URL
+from topics import TOPIC_PREFIX_FOR_STATIONS_CONNECTOR, STATIONS_TOPIC_NAME
 
 logger = logging.getLogger(__name__)
 
@@ -31,8 +32,8 @@ class TransformedStation(faust.Record):
 
 
 app = faust.App("stations-stream", broker=KAFKA_URL, store="memory://")
-topic = app.topic(f'{STATIONS_TOPIC_PREFIX}stations', value_type=Station)
-out_topic = app.topic("stations", partitions=1, value_type=TransformedStation)
+topic = app.topic(f'{TOPIC_PREFIX_FOR_STATIONS_CONNECTOR}stations', value_type=Station)
+out_topic = app.topic(STATIONS_TOPIC_NAME, partitions=1, value_type=TransformedStation)
 table = app.Table(
     "stations-table",
     default=TransformedStation,

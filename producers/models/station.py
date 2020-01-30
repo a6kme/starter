@@ -4,6 +4,7 @@ from pathlib import Path
 
 from confluent_kafka import avro
 
+from topics import ARRIVALS_TOPIC_NAME
 from .producer import Producer
 from .turnstile import Turnstile
 from config import NUM_PARTITIONS, NUM_REPLICAS
@@ -18,22 +19,13 @@ class Station(Producer):
 
     def __init__(self, station_id, name, color, direction_a=None, direction_b=None):
         self.name = name
-        station_name = (
-            self.name.lower()
-                .replace("/", "_and_")
-                .replace(" ", "_")
-                .replace("-", "_")
-                .replace("'", "")
-        )
-
         super().__init__(
-            topic_name=station_name,
+            topic_name=ARRIVALS_TOPIC_NAME,
             key_schema=Station.key_schema,
             value_schema=Station.value_schema,
             num_partitions=NUM_PARTITIONS,
             num_replicas=NUM_REPLICAS,
         )
-
         self.station_id = int(station_id)
         self.color = color
         self.dir_a = direction_a

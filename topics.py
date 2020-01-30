@@ -1,0 +1,6 @@
+WEATHER_TOPIC_NAME = 'org.chicago.weather'
+STATIONS_TOPIC_NAME = 'org.chicago.stations'
+TURNSTILE_TOPIC_NAME = 'org.chicago.turnstiles'
+TOPIC_PREFIX_FOR_STATIONS_CONNECTOR = 'org.chicago.connector.'
+ARRIVALS_TOPIC_NAME = 'org.chicago.arrivals'
+TURNSTILE_SUMMARY_TABLE_NAME = 'turnstile_summary'
