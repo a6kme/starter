@@ -5,7 +5,7 @@ import time
 from confluent_kafka.admin import AdminClient, NewTopic
 from confluent_kafka.avro import AvroProducer
 
-from config import KAFKA_URL, SCHEMA_REGISTRY_URL
+from config import BROKER_URL, SCHEMA_REGISTRY_URL
 
 logger = logging.getLogger(__name__)
 
@@ -35,13 +35,13 @@ class Producer:
         self.num_replicas = num_replicas
 
         self.broker_properties = {
-            "bootstrap.servers": KAFKA_URL,
+            "bootstrap.servers": BROKER_URL,
             "schema.registry.url": SCHEMA_REGISTRY_URL
         }
 
         # Create the admin client instance
         if Producer.admin_client is None:
-            Producer.admin_client = AdminClient({'bootstrap.servers': KAFKA_URL})
+            Producer.admin_client = AdminClient({'bootstrap.servers': BROKER_URL})
 
         # If the topic does not already exist, try to create it
         if self.topic_name not in Producer.existing_topics:
