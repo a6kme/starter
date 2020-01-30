@@ -4,7 +4,7 @@ import logging
 
 import requests
 
-from config import DATABASE_URL, DATABASE_USER, DATABASE_PASSWORD
+from config import DATABASE_URL, DATABASE_USER, DATABASE_PASSWORD, STATIONS_TOPIC_PREFIX
 
 logger = logging.getLogger(__name__)
 
@@ -39,7 +39,7 @@ def configure_connector():
                 "table.whitelist": "stations",
                 "mode": "incrementing",
                 "incrementing.column.name": "stop_id",
-                "topic.prefix": "stations",
+                "topic.prefix": STATIONS_TOPIC_PREFIX,
                 "poll.interval.ms": 10000,  # 10 seconds
             }
         }),
