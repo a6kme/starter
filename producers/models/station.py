@@ -28,8 +28,8 @@ class Station(Producer):
         )
         self.station_id = int(station_id)
         self.color = color
-        self.dir_a = direction_a
-        self.dir_b = direction_b
+        self.dir_a = direction_a  # type: Station
+        self.dir_b = direction_b  # type: Station
         self.a_train = None
         self.b_train = None
         self.turnstile = Turnstile(self)
@@ -42,8 +42,8 @@ class Station(Producer):
             value={
                 "station_id": self.station_id,
                 "train_id": train.train_id,
-                "train_status": train.status.value,
-                "line": None,
+                "train_status": train.status.name,
+                "line": self.color.name,
                 "direction": direction,
                 "prev_station_id": prev_station_id,
                 "prev_direction": prev_direction

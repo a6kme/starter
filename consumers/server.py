@@ -67,7 +67,7 @@ def run_server():
             offset_earliest=True,
         ),
         KafkaConsumer(
-            f'{topics.TOPIC_PREFIX_FOR_STATIONS_CONNECTOR}stations',
+            topics.STATIONS_TOPIC_NAME,
             lines.process_message,
             offset_earliest=True,
             is_avro=False,
@@ -80,11 +80,9 @@ def run_server():
         KafkaConsumer(
             topics.TURNSTILE_SUMMARY_TABLE_NAME,
             lines.process_message,
-            offset_earliest=True,
-            is_avro=False,
+            offset_earliest=True
         ),
     ]
-
     try:
         logger.info(
             "Open a web browser to http://localhost:8888 to see the Transit Status Page"

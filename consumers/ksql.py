@@ -11,21 +11,19 @@ from topics import TURNSTILE_SUMMARY_TABLE_NAME, TURNSTILE_TOPIC_NAME
 logger = logging.getLogger(__name__)
 
 KSQL_STATEMENT = f"""
-CREATE TABLE turnstile (
-    timestamp BIGINT,
+CREATE STREAM turnstile_stream (
     station_id INT,
     station_name VARCHAR,
-    line INT
+    line VARCHAR
 ) WITH (
-    KAFKA_TOPIC='{TURNSTILE_TOPIC_NAME}', VALUE_FORMAT='Avro', KEY='timestamp'
+    KAFKA_TOPIC='{TURNSTILE_TOPIC_NAME}',
+    VALUE_FORMAT='AVRO',
+    KEY='station_id'
 );
 
 CREATE TABLE {TURNSTILE_SUMMARY_TABLE_NAME}
-    AS 
-        SELECT 
-            station_id, count(*) as count 
-        FROM turnstile 
-        GROUP BY station_id;
+    WITH (KAFKA_TOPIC='{TURNSTILE_SUMMARY_TABLE_NAME}', PARTITIONS=2, REPLICAS=1)
+    AS SELECT station_id, count(*) as count FROM turnstile_stream GROUP BY station_id;
 """
 
 

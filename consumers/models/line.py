@@ -2,6 +2,7 @@
 import json
 import logging
 
+import topics
 from consumers.models import Station
 
 
@@ -56,16 +57,16 @@ class Line:
 
     def process_message(self, message):
         """Given a kafka message, extract data"""
-        if message.topic == 'faust':
+        if message.topic() == topics.STATIONS_TOPIC_NAME:
             value = json.loads(message.value())
             try:
                 self._handle_station(value)
             except Exception as e:
                 logger.fatal("bad station? %s, %s", value, e)
-        elif message.topic == 'arrival':
+        elif message.topic() == topics.ARRIVALS_TOPIC_NAME:
             self._handle_arrival(message)
-        elif message.topic == 'turnstile':
-            json_data = json.loads(message.value())
+        elif message.topic() == topics.TURNSTILE_SUMMARY_TABLE_NAME:
+            json_data = message.value()
             station_id = json_data.get("STATION_ID")
             station = self.stations.get(station_id)
             if station is None:

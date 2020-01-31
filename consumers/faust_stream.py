@@ -45,13 +45,14 @@ table = app.Table(
 @app.agent(topic)
 async def process_station(stations):
     async for station in stations:
-        line = "N/A"
         if station.red:
             line = "red"
         elif station.blue:
             line = "blue"
         elif station.green:
             line = "green"
+        else:
+            line = "NA"
         table[station.station_id] = TransformedStation(
             station_id=station.station_id,
             station_name=station.station_name,

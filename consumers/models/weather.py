@@ -1,4 +1,5 @@
 """Contains functionality related to Weather"""
+import json
 import logging
 
 from enums import weather_status
@@ -16,5 +17,6 @@ class Weather:
 
     def process_message(self, message):
         """Handles incoming weather data"""
-        self.temperature = message.temperature
-        self.status = weather_status(message.status).name
+        weather_value = message.value()
+        self.temperature = round(weather_value['temperature'], 2)
+        self.status = weather_status(weather_value['status']).name

@@ -2,7 +2,7 @@
 import logging
 
 from confluent_kafka import Consumer, OFFSET_BEGINNING
-from confluent_kafka.avro import AvroConsumer
+from confluent_kafka.avro import AvroConsumer, SerializerError
 from tornado import gen
 
 from config import BROKER_URL, SCHEMA_REGISTRY_URL
@@ -59,14 +59,18 @@ class KafkaConsumer:
 
     def _consume(self):
         """Polls for a message. Returns 1 if a message was received, 0 otherwise"""
-        message = self.consumer.consume(num_messages=1)
+        message = None
+        try:
+            message = self.consumer.poll(1)
+        except SerializerError as e:
+            logger.error(f"Message deserialization failed for {message}: {e}")
         if message is None:
             return 0
         elif message.error():
-            logger.error("Error in message")
+            logger.error(f"Error {message.error()}, topic: {message.topic()}")
         else:
             self.message_handler(message)
-            return 1
+        return 1
 
     def close(self):
         """Cleans up any open kafka consumers"""
