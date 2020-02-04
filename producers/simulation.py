@@ -9,12 +9,11 @@ from pathlib import Path
 
 import pandas as pd
 
-from producers.connector import configure_connector
-from producers.models import Line, Weather
-
 # Import logging before models to ensure configuration is picked up
 logging.config.fileConfig(f"{Path(__file__).parents[0]}/logging.ini")
 
+from producers.connector import configure_connector
+from producers.models import Line, Weather
 
 logger = logging.getLogger(__name__)
 

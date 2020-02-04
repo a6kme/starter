@@ -80,7 +80,8 @@ def run_server():
         KafkaConsumer(
             topics.TURNSTILE_SUMMARY_TABLE_NAME,
             lines.process_message,
-            offset_earliest=True
+            offset_earliest=True,
+            has_avro_key=False
         ),
     ]
     try:

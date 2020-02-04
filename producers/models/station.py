@@ -5,14 +5,14 @@ from pathlib import Path
 from confluent_kafka import avro
 
 from topics import ARRIVALS_TOPIC_NAME
-from .producer import Producer
+from .avro_producer import AvroProducer
 from .turnstile import Turnstile
 from config import NUM_PARTITIONS, NUM_REPLICAS
 
 logger = logging.getLogger(__name__)
 
 
-class Station(Producer):
+class Station(AvroProducer):
     """Defines a single station"""
     key_schema = avro.load(f"{Path(__file__).parents[0]}/schemas/arrival_key.json")
     value_schema = avro.load(f"{Path(__file__).parents[0]}/schemas/arrival_value.json")
@@ -22,9 +22,7 @@ class Station(Producer):
         super().__init__(
             topic_name=ARRIVALS_TOPIC_NAME,
             key_schema=Station.key_schema,
-            value_schema=Station.value_schema,
-            num_partitions=NUM_PARTITIONS,
-            num_replicas=NUM_REPLICAS,
+            value_schema=Station.value_schema
         )
         self.station_id = int(station_id)
         self.color = color
@@ -38,7 +36,7 @@ class Station(Producer):
         """Simulates train arrivals at this station"""
         self.producer.produce(
             topic=self.topic_name,
-            key={"timestamp": self.time_millis()},
+            key={"timestamp": str(self.time_millis())},
             value={
                 "station_id": self.station_id,
                 "train_id": train.train_id,

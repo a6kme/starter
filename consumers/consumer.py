@@ -6,6 +6,7 @@ from confluent_kafka.avro import AvroConsumer, SerializerError
 from tornado import gen
 
 from config import BROKER_URL, SCHEMA_REGISTRY_URL
+from consumers.string_avro_consumer import StringKeyAvroConsumer
 
 logger = logging.getLogger(__name__)
 
@@ -18,6 +19,7 @@ class KafkaConsumer:
             topic_name_pattern,
             message_handler,
             is_avro=True,
+            has_avro_key=True,
             offset_earliest=False,
             sleep_secs=1.0,
             consume_timeout=0.1,
@@ -36,7 +38,10 @@ class KafkaConsumer:
 
         if is_avro is True:
             self.broker_properties['schema.registry.url'] = SCHEMA_REGISTRY_URL
-            self.consumer = AvroConsumer(self.broker_properties)
+            if has_avro_key:
+                self.consumer = AvroConsumer(self.broker_properties)
+            else:
+                self.consumer = StringKeyAvroConsumer(self.broker_properties)
         else:
             self.consumer = Consumer(self.broker_properties)
 
@@ -63,7 +68,7 @@ class KafkaConsumer:
         try:
             message = self.consumer.poll(1)
         except SerializerError as e:
-            logger.error(f"Message deserialization failed for {message}: {e}")
+            logger.error(f"Message deserialization failed: {e}")
         if message is None:
             return 0
         elif message.error():

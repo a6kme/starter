@@ -7,15 +7,15 @@ from pathlib import Path
 
 import requests
 
-from config import REST_PROXY_URL, NUM_PARTITIONS, NUM_REPLICAS
+from config import REST_PROXY_URL
 from enums import weather_status
 from topics import WEATHER_TOPIC_NAME
-from .producer import Producer
+from .avro_producer import AvroProducer
 
 logger = logging.getLogger(__name__)
 
 
-class Weather(Producer):
+class Weather(AvroProducer):
     """Defines a simulated weather model"""
 
     status = weather_status
@@ -48,9 +48,7 @@ class Weather(Producer):
         super().__init__(
             self.topic_name,
             key_schema=Weather.key_schema,
-            value_schema=Weather.value_schema,
-            num_partitions=NUM_PARTITIONS,
-            num_replicas=NUM_REPLICAS
+            value_schema=Weather.value_schema
         )
 
     def _set_weather(self, month):
@@ -75,7 +73,7 @@ class Weather(Producer):
                     "records": [
                         {
                             "key": {
-                                "timestamp": datetime.datetime.utcnow().timestamp()
+                                "timestamp": str(int(datetime.datetime.utcnow().timestamp() * 1000))
                             },
                             "value": {
                                 "temperature": self.temp,
